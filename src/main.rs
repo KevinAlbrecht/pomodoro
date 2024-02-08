@@ -1,5 +1,5 @@
-mod loader;
-mod windows;
+mod helpers;
+mod task_manager;
 
 use clap::{command, Parser};
 
@@ -9,12 +9,16 @@ struct Args {
     #[arg(short, long, default_value_t = String::from("Driiing") )]
     name: String,
 
-    #[arg(short, long, default_value_t = 1)]
-    interval: u8,
+    #[arg(short, long, default_value_t = 1500)]
+    time: u16,
 }
 
 fn main() {
     let args = Args::parse();
+    let now = std::time::Instant::now();
 
-    windows::open();
+    let mut task_manager = task_manager::TaskManager::new();
+
+    task_manager.create_task(args.name, args.time);
+    loop {}
 }
