@@ -1,12 +1,10 @@
 mod helpers;
 mod task_manager;
-
-use std::{io::stdin, thread};
+mod ui;
 
 use clap::{command, Parser};
-
-use crate::helpers::printer::updateOut;
-
+use std::{io::stdin, thread};
+use crate::ui::printer::updateOut;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -30,7 +28,7 @@ fn main() {
             Ok(command) => match command.status {
                 task_manager::models::TaskCommandType::Timeleft(timeleft) => {
                     // println!("Timer:\"{}\", Time left: {}", command.id, timeleft);
-                    updateOut(vec![helpers::printer::DisplayInformation {
+                    updateOut(vec![ui::printer::DisplayInformation {
                         name: command.id.clone(),
                         time: timeleft,
                         status: task_manager::models::TaskStatus::Running,
@@ -38,7 +36,7 @@ fn main() {
                 }
                 task_manager::models::TaskCommandType::StatusChanged(status) => {
                     // println!("Task status changed: {:?}", status.to_string());
-                    updateOut(vec![helpers::printer::DisplayInformation {
+                    updateOut(vec![ui::printer::DisplayInformation {
                         name: command.id.clone(),
                         time: 0,
                         status: task_manager::models::TaskStatus::Stopped,
