@@ -5,19 +5,10 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use self::task::{Task, TaskStatus};
+use models::{TaskCommand, TaskCommandType, TaskStatus};
 
+pub mod models;
 mod task;
-
-pub enum TaskCommandType {
-    Timeleft(u16),
-    StatusChanged(TaskStatus),
-}
-
-pub struct TaskCommand {
-    pub id: String,
-    pub status: TaskCommandType,
-}
 
 pub struct TaskManager {
     pub receiver: Receiver<TaskCommand>,
@@ -43,31 +34,36 @@ impl TaskManager {
             .to_string();
 
         let id = format!("{}_{}", name, timestamp);
-        let new_task = task::Task::new(id, name, timer);
-        self.tasks.insert(id, new_task);
-        self.sender.send(TaskCommand {
-            id,
-            status: TaskCommandType::StatusChanged(TaskStatus::Stopped),
-        });
+        let new_task = task::Task::new(id.clone(), name, timer, self.sender.clone());
+        self.tasks.insert(id.clone(), new_task);
+        // self.sender
+        //     .send(TaskCommand {
+        //         id: id.clone(),
+        //         status: TaskCommandType::StatusChanged(TaskStatus::Stopped),
+        //     })
+        //     .unwrap();
+
+        id
     }
 
-    // pub fn start_task(&mut self, id: String, new_timer: Option<u16>) {
-    //     let task = self.tasks.get_mut(&id).unwrap();
-    //     task.start(new_timer);
-    // }
+    pub fn start_task(&mut self, id: String, new_timer: Option<u16>) {
+        let task = self.tasks.get_mut(&id).unwrap();
+        // println!("start_task task: {}", id);
+        task.start(new_timer);
+    }
 
-    // pub fn pause_task(&mut self, id: String) {
-    //     let task = self.tasks.get_mut(&id).unwrap();
-    //     task.pause();
-    // }
+    pub fn pause_task(&mut self, id: String) {
+        let task = self.tasks.get_mut(&id).unwrap();
+        task.pause();
+    }
 
-    // pub fn resume_task(&mut self, id: String) {
-    //     let task = self.tasks.get_mut(&id).unwrap();
-    //     task.resume();
-    // }
+    pub fn resume_task(&mut self, id: String) {
+        let task = self.tasks.get_mut(&id).unwrap();
+        task.resume();
+    }
 
-    // pub fn stop_task(&mut self, id: String) {
-    //     let task = self.tasks.get_mut(&id).unwrap();
-    //     task.stop();
-    // }
+    pub fn stop_task(&mut self, id: String) {
+        let task = self.tasks.get_mut(&id).unwrap();
+        task.stop();
+    }
 }
