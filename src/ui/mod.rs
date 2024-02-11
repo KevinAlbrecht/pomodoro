@@ -1,1 +1,1 @@
-pub mod printer;
+pub mod tui;

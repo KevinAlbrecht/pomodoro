@@ -2,9 +2,10 @@ mod helpers;
 mod task_manager;
 mod ui;
 
+use crate::ui::tui;
 use clap::{command, Parser};
 use std::{io::stdin, thread};
-use crate::ui::printer::updateOut;
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -18,8 +19,10 @@ struct Args {
 fn main() {
     let args = Args::parse();
     let mut task_manager = task_manager::TaskManager::new();
+    let mut display = ui::tui::Display::new(None);
     let mut tasks: Vec<String> = vec![];
 
+    display.init();
     tasks.push(task_manager.create_task(args.name.clone(), args.time));
     task_manager.start_task(tasks[0].clone(), None);
 
@@ -28,19 +31,19 @@ fn main() {
             Ok(command) => match command.status {
                 task_manager::models::TaskCommandType::Timeleft(timeleft) => {
                     // println!("Timer:\"{}\", Time left: {}", command.id, timeleft);
-                    updateOut(vec![ui::printer::DisplayInformation {
-                        name: command.id.clone(),
-                        time: timeleft,
-                        status: task_manager::models::TaskStatus::Running,
-                    }]);
+                    // updateOut(vec![ui::tui::DisplayInformation {
+                    //     name: command.id.clone(),
+                    //     time: timeleft,
+                    //     status: task_manager::models::TaskStatus::Running,
+                    // }]);
                 }
                 task_manager::models::TaskCommandType::StatusChanged(status) => {
                     // println!("Task status changed: {:?}", status.to_string());
-                    updateOut(vec![ui::printer::DisplayInformation {
-                        name: command.id.clone(),
-                        time: 0,
-                        status: task_manager::models::TaskStatus::Stopped,
-                    }]);
+                    // updateOut(vec![ui::tui::DisplayInformation {
+                    //     name: command.id.clone(),
+                    //     time: 0,
+                    //     status: task_manager::models::TaskStatus::Stopped,
+                    // }]);
                 }
             },
             Err(_) => {} //do nothing, wait for more msgs to come
